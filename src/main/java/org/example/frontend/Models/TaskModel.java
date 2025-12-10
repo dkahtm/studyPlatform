@@ -21,7 +21,7 @@ public class TaskModel {
     private String description;
 
 
-    private Status status = Status.OPEN;
+    private Status status;
 
     private LocalDate deadline;
 

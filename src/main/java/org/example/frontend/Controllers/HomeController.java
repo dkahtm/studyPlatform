@@ -8,13 +8,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+
+import org.example.frontend.Models.TaskModel;
+import org.example.frontend.Models.TaskModel2;
 import org.example.frontend.Models.UserModel;
 import org.example.frontend.Services.AuthService;
+import org.example.frontend.Services.TaskService;
+import org.example.frontend.Services.TaskService2;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +35,11 @@ public class HomeController {
     @FXML
     private Button Student;
     @FXML
+    private Button showStudentButton;
+    @FXML
     private Button task;
+    @FXML
+    private Button deleteButton;
     @FXML
     private Button edit;
     @FXML
@@ -41,6 +50,12 @@ public class HomeController {
     private ListView<String> studentsList;
 
     @FXML
+    private ListView<String> taskList;
+
+
+    private TaskService2 taskService2 = new TaskService2();
+
+    @FXML
     private Button deleteStudentButton;
 
     private Integer selectedStudentId;
@@ -49,10 +64,14 @@ public class HomeController {
     private Integer groupId;
     private Integer userId;
 
+
     public void setData(Integer groupId, Integer userId) {
         this.groupId = groupId;
         this.userId = userId;
     }
+
+
+
 
     @FXML
     public void addGroup(){
@@ -128,13 +147,42 @@ public class HomeController {
                         selectedGroupId = extractGroupId(newValue);
 
                         // Активируем кнопки, которые требуют выбора группы
+                        deleteButton.setDisable(false);
+                        //deleteGroupButton.setDisable(false); // если есть такая кнопка
+
+                        // Загружаем студентов этой группы
+                        //loadStudentsForGroup(selectedGroupId);
+
+
+                    } else {
+                        selectedGroupId = null;
+
+                        // Деактивируем кнопки
+                        deleteButton.setDisable(true);
+                        //deleteGroupButton.setDisable(true);
+
+                        // Очищаем список студентов
+                        //studentsList.getItems().clear();
+                    }
+                }
+        );
+
+
+        groupList.getSelectionModel().selectedItemProperty().addListener(
+                (observable, oldValue, newValue) -> {
+                    if (newValue != null) {
+                        // Извлекаем ID группы из выбранной строки
+                        // Например: "ID: 1 | Name: Test Group | Description: Test"
+                        selectedGroupId = extractGroupId(newValue);
+
+                        // Активируем кнопки, которые требуют выбора группы
                         task.setDisable(false);
                         //deleteGroupButton.setDisable(false); // если есть такая кнопка
 
                         // Загружаем студентов этой группы
                         //loadStudentsForGroup(selectedGroupId);
 
-                        System.out.println("Selected group ID: " + selectedGroupId);
+
                     } else {
                         selectedGroupId = null;
 
@@ -162,10 +210,61 @@ public class HomeController {
                     }
                 }
         );
+        groupList.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
+            if (newV != null) {
+                try {
+                    // Вытаскиваем ID из строки группы
+                    int groupId = Integer.parseInt(newV.split("\\|")[0].replace("ID:", "").trim());
+                    loadTasks(groupId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         // Изначально кнопка неактивна
         deleteStudentButton.setDisable(true);
+        deleteButton.setDisable(true);
     }
+
+
+    private void loadTasks(Integer groupId) {
+        try {
+            // Получаем JSON задач с сервера
+            String json = taskService2.getTasksByGroupJson(groupId); // допустим, метод возвращает JSON строку
+            System.out.println("Tasks JSON for group " + groupId + ": " + json);
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules(); // обязательно для LocalDate / LocalDateTime
+
+            // Парсим JSON в список Map
+            List<Map<String, Object>> tasksData = mapper.readValue(json, List.class);
+
+            List<String> taskItems = new ArrayList<>();
+            for (Map<String, Object> task : tasksData) {
+                taskItems.add(
+                        "ID: " + task.get("taskId") +
+                                " | Title: " + task.get("title") +
+                                " | Status: " + task.get("status") +
+                                " | Deadline: " + task.get("deadline")
+                );
+            }
+
+            // Если задач нет, показываем сообщение
+            if (taskItems.isEmpty()) {
+                taskItems.add("No tasks for this group");
+            }
+
+            // Устанавливаем в ListView
+            taskList.setItems(FXCollections.observableArrayList(taskItems));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            taskList.setItems(FXCollections.observableArrayList("Error loading tasks"));
+        }
+    }
+
+
 
     private void loadGroups() {
         try {
@@ -202,6 +301,7 @@ public class HomeController {
                                 Integer groupId = Integer.parseInt(idStr);
                                 currentGroupId = groupId;
                                 loadGroupStudents(groupId);
+
 
                                 // Также показываем название группы
                                 String groupName = newValue.split("\\|")[1].replace("Name:", "").trim();
@@ -248,6 +348,18 @@ public class HomeController {
             e.printStackTrace();
             studentsList.setItems(FXCollections.observableArrayList("Error loading students"));
         }
+    }
+    @FXML
+    public void deleteGroup() {
+        boolean response = AuthService.deletefromGroup(currentGroupId);
+        if (response) {
+            System.out.println("group removed successfully");
+            // Обновляем список студентов
+            loadGroupStudents(currentGroupId);
+        } else {
+            System.err.println("Error removing student: ");
+        }
+
     }
 
     @FXML
@@ -305,9 +417,22 @@ public class HomeController {
             return null;
         }
     }
+    public void openList() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/frontend/allStudents.fxml"));
+            Parent root = loader.load();
 
+            // создаём новое окно
+            Stage newStage = new Stage();
+            newStage.setTitle("All Students");
+            newStage.setScene(new Scene(root));
 
+            newStage.show(); // показываем новое доп. окно
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 

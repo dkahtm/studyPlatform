@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
+import org.example.frontend.Models.UserModel;
 import org.example.frontend.Services.AuthService;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

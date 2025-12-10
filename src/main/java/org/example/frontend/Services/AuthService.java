@@ -132,9 +132,9 @@ public class AuthService {
         }
     }
 
-    public static String getAvailableStudents() {
+    public static String getStudents() {
         try {
-            URL url = new URL(SERVER_URL + "/home/available-students");
+            URL url = new URL(SERVER_URL + "/api/users/all");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
 
@@ -249,6 +249,32 @@ public class AuthService {
             e.printStackTrace();
             return "[]";
         }
+    }
+
+    public static boolean deletefromGroup(Integer groupId){
+        try {
+            URL url = new URL(SERVER_URL + "/home/delete/" + groupId);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+            con.setRequestMethod("POST");
+            con.setDoOutput(true);
+            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+
+            BufferedReader in =
+                    new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String response = in.readLine();
+            in.close();
+
+            return Boolean.parseBoolean(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+
+
     }
 
 

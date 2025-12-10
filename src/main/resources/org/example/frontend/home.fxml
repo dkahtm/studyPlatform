@@ -4,8 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -21,6 +19,7 @@
             <Label text="Student groups" />
             <ListView fx:id="groupList" VBox.vgrow="ALWAYS" />
             <Button fx:id="group" onAction="#addGroup" text="Add group" />
+         <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteGroup" text="Delete" />
         </VBox>
 
         <!-- Права колонка — деталі групи -->
@@ -29,18 +28,11 @@
             <Label text="Students" />
             <ListView fx:id="studentsList" VBox.vgrow="ALWAYS" />
             <Button fx:id="Student" onAction="#addStudent" text="Add student" />
+         <Button fx:id="showStudentButton" alignment="CENTER" mnemonicParsing="false" onAction="#openList" text="Show students" />
          <Button fx:id="deleteStudentButton" mnemonicParsing="false" onAction="#handleDeleteStudent" text="Delete" />
         </VBox>
     </HBox>
-
-    <!-- Таблиця завдань -->
-    <TableView fx:id="taskTable" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="titleCol" prefWidth="200" text="Title" />
-            <TableColumn fx:id="statusCol" prefWidth="150" text="Status" />
-            <TableColumn fx:id="deadlineCol" prefWidth="150" text="Deadline" />
-        </columns>
-    </TableView>
+   <ListView fx:id="taskList" prefHeight="200.0" prefWidth="200.0" />
 
     <!-- Нижні кнопки -->
     <HBox spacing="10">
