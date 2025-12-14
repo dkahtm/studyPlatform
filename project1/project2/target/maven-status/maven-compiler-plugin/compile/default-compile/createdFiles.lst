@@ -1,0 +1,5 @@
+com/study/studyplatform/JavaFX/controllers/MainController.class
+com/study/studyplatform/JavaFX/entity/User.class
+com/study/studyplatform/JavaFX/UserService/UserService.class
+com/study/studyplatform/JavaFX/repository/UserRepository.class
+com/study/studyplatform/JavaFX/controllers/RegisterController.class

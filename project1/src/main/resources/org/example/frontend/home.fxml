@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.frontend.Controllers.HomeController">
+    <padding>
+        <Insets bottom="10" left="10" right="10" top="10" />
+    </padding>
+
+    <!-- Верхня частина: дві колонки -->
+    <HBox spacing="20" VBox.vgrow="NEVER">
+        <!-- Ліва колонка — групи -->
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Student groups" />
+            <ListView fx:id="groupList" VBox.vgrow="ALWAYS" />
+            <Button fx:id="group" onAction="#addGroup" text="Add group" />
+         <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#deleteGroup" text="Delete" />
+        </VBox>
+
+        <!-- Права колонка — деталі групи -->
+        <VBox spacing="5" HBox.hgrow="ALWAYS">
+            <Label text="Group details" />
+            <Label text="Students" />
+            <ListView fx:id="studentsList" VBox.vgrow="ALWAYS" />
+            <Button fx:id="Student" onAction="#addStudent" text="Add student" />
+         <Button fx:id="showStudentButton" alignment="CENTER" mnemonicParsing="false" onAction="#openList" text="Show students" />
+         <Button fx:id="deleteStudentButton" mnemonicParsing="false" onAction="#handleDeleteStudent" text="Delete" />
+        </VBox>
+    </HBox>
+   <ListView fx:id="taskList" prefHeight="200.0" prefWidth="200.0" />
+
+    <!-- Нижні кнопки -->
+    <HBox spacing="10">
+        <Button fx:id="task" onAction="#addTask" text="Add task" />
+        <Button fx:id="edit" onAction="#editTask" text="Edit" />
+        <Button fx:id="delete" onAction="#deleteTask" text="Delete" />
+      <Button fx:id="statsWindow" mnemonicParsing="false" onAction="#openStatsWindow" text="Stats" />
+    </HBox>
+
+</VBox>
